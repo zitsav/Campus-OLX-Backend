@@ -1,0 +1,38 @@
+const mongoose = require('mongoose')
+
+const ProductSchema = new mongoose.Schema({
+    name: {
+      type: String,
+      required: [true, 'Please the name of the product'],
+      maxlength: 50,
+    },
+    description: {
+        type: String,
+        required: [true, 'Please provide a suitable description for the product'],
+        maxlength: 50,
+    },
+    category: [{
+        type: String,
+        enum: ['cooler', 'mattress', 'headsets', 'books', 'miscellaneous'],
+        required: [true, 'Please provide at least one category'],
+    }],    
+    createdBy: {
+      type: mongoose.Types.ObjectId,
+      ref: 'User',
+      required: [true, 'Please provide user'],
+    },
+    price: {
+        type: Number,
+        maxValue: 15000,
+        minValue: 50,
+        required:  [true, 'Please provide a valid price for the product'],
+    },
+    isSold: {
+        type: Boolean,
+        default: false,
+    }
+    },
+    { timestamps: true }
+)
+
+module.exports = mongoose.model('Job', ProductSchema)
