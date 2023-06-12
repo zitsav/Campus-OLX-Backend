@@ -95,4 +95,6 @@ const authUser = asyncHandler(async (req, res) => {
   }
 });
 
+// @TODO: Add all user controller and search controllers
+
 module.exports = { registerUser, authUser };
