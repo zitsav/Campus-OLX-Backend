@@ -1,32 +1,32 @@
-require('dotenv').config();
-require('express-async-errors');
-const express = require('express');
+const express = require("express");
+const dotenv = require("dotenv");
+
+const userRoutes = require("./routes/userRoutes");
+const connectDB = require('./db/connect');
+connectDB();
+const { notFound, errorHandler } = require("./middleware/errorMiddleware");
+const {authentication} = require("./middleware/authentication");
+
+dotenv.config();
+connectDB();
 const app = express();
 
-const connectDB = require('./db/connect')
+app.use(express.json()); //to accept JSON data
 
-// error handler
-const notFoundMiddleware = require('./middleware/not-found');
-const errorHandlerMiddleware = require('./middleware/error-handler');
-const authentication = require('./middleware/authentication')
+app.get("/", (req, res) => {
+  res.send("API is running");
+});
 
-app.use(express.json());
-// extra packages
+// app.get("/api/test", (req, res) => {
+//   res.send("Hello");
+// })
 
-app.use(notFoundMiddleware);
-app.use(errorHandlerMiddleware);
+app.use("/api/user", userRoutes);
 
-const port = process.env.PORT || 3000;
 
-const start = async () => {
-  try {
-    await connectDB(process.env.MONGO_URI)
-    app.listen(port, () =>
-      console.log(`Server is listening on port ${port}...`)
-    );
-  } catch (error) {
-    console.log(error);
-  }
-};
+app.use(notFound);
+app.use(errorHandler);
 
-start();
+const PORT = process.env.PORT || 3000;
+
+app.listen(PORT, console.log(`Server is running on port ${PORT}`));
