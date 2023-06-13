@@ -76,7 +76,7 @@ const registerUser = asyncHandler(async (req, res) => {
       text: `Your verification code is: ${code}. It will expire in 10 minutes.`,
     };
 
-    // Send the email
+    //@desc Send the email
     await transporter.sendMail(mailOptions);
 
     res.status(201).json({
@@ -118,7 +118,7 @@ const verifyCode = asyncHandler(async (req, res) => {
     throw new Error('Verification code has expired');
   }
 
-  // Clear the registration code and expiration once it's verified
+  //  Clear the registration code and expiration once it's verified
   user.isVerified = true;
   user.registrationCode = undefined;
   user.registrationCodeExpiration = undefined;
@@ -164,7 +164,24 @@ const authUser = asyncHandler(async (req, res) => {
   });
 });
 
+// @desc    Get user profile
+
+const allUsers = asyncHandler(async (req, res) => {
+  const keyword = req.query.search
+  ? {
+      $or: [
+        { firstName: { $regex: req.query.search, $options: "i" } },
+        { lastName: { $regex: req.query.search, $options: "i" } },
+        { enrollmentNo: { $regex: req.query.search, $options: "i" } },
+      ],
+    }
+  : {};
+
+  const users = await User.find(keyword).find({ _id: { $ne: req.user._id } });
+  res.send(users);
+})
+
 
 // @TODO: Add all user controller and search controllers
 
-module.exports = { registerUser, authUser, verifyCode };
+module.exports = { registerUser, authUser,allUsers, verifyCode };

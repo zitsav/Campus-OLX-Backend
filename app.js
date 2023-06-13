@@ -8,7 +8,6 @@ const { notFound, errorHandler } = require("./middleware/errorMiddleware");
 const {authentication} = require("./middleware/authentication");
 
 dotenv.config();
-connectDB();
 const app = express();
 
 app.use(express.json()); //to accept JSON data
@@ -29,4 +28,4 @@ app.use(errorHandler);
 
 const PORT = process.env.PORT || 3000;
 
-app.listen(PORT, console.log(`Server is running on port ${PORT}`));
+app.listen(PORT, console.log(`Server is running on port ${PORT}`.bold));
