@@ -1,6 +1,8 @@
 const asyncHandler = require("express-async-handler");
 const User = require("../models/User");
 const generateToken = require("../config/generateToken");
+const nodemailer = require('nodemailer');
+const crypto = require('crypto');
 
 // @desc    Register a new user
 
@@ -28,15 +30,17 @@ const registerUser = asyncHandler(async (req, res) => {
     !password
   ) {
     res.status(400);
-    throw new Error("Please fill all the fields");
+    throw new Error('Please fill all the fields');
   }
 
   const userExists = await User.findOne({ email });
   if (userExists) {
-    //if user already exists
     res.status(400);
-    throw new Error("User already exists");
+    throw new Error('User already exists');
   }
+
+  // Generate a 6-digit alphanumeric code
+  const code = crypto.randomBytes(3).toString('hex').toUpperCase();
 
   const user = await User.create({
     firstName,
@@ -48,9 +52,33 @@ const registerUser = asyncHandler(async (req, res) => {
     upiId,
     email,
     password,
+    registrationCode: code, // Add the code as an attribute of the user
+    registrationCodeExpiration: Date.now() + 10 * 60 * 1000, // Set the code expiration time to 10 minutes from now
   });
 
   if (user) {
+    // Create a Nodemailer transporter
+    const transporter = nodemailer.createTransport({
+      host: 'smtp.gmail.com',
+      port: 465,
+      secure: true,
+      auth: {
+        user: 'grievanceportaliiita4@gmail.com',
+        pass: 'bryoccqsbhkhnhah',
+      },
+    });
+
+    // Prepare the email message
+    const mailOptions = {
+      from: 'Campus OLX',
+      to: email,
+      subject: 'Registration Confirmation',
+      text: `Your verification code is: ${code}. It will expire in 10 minutes.`,
+    };
+
+    // Send the email
+    await transporter.sendMail(mailOptions);
+
     res.status(201).json({
       _id: user._id,
       firstName: user.firstName,
@@ -65,9 +93,40 @@ const registerUser = asyncHandler(async (req, res) => {
     });
   } else {
     res.status(400);
-    throw new Error("Failed to create User");
+    throw new Error('Failed to create User');
   }
 });
+
+// @desc    Verify the otp
+
+const verifyCode = asyncHandler(async (req, res) => {
+  const { email, code } = req.body;
+
+  const user = await User.findOne({ email });
+  if (!user) {
+    res.status(404);
+    throw new Error('User not found');
+  }
+
+  if (user.registrationCode !== code) {
+    res.status(400);
+    throw new Error('Invalid verification code');
+  }
+
+  if (user.registrationCodeExpiration < Date.now()) {
+    res.status(400);
+    throw new Error('Verification code has expired');
+  }
+
+  // Clear the registration code and expiration once it's verified
+  user.isVerified = true;
+  user.registrationCode = undefined;
+  user.registrationCodeExpiration = undefined;
+  await user.save();
+
+  res.status(200).json({ message: 'Verification successful' });
+});
+
 
 // @desc    Login user
 
@@ -76,25 +135,36 @@ const authUser = asyncHandler(async (req, res) => {
 
   const user = await User.findOne({ email });
 
-  if (user && (await user.comparePassword(password))) {
-    res.json({
-      _id: user._id,
-      firstName: user.firstName,
-      lastName: user.lastName,
-      enrollmentNo: user.enrollmentNo,
-      semester: user.semester,
-      branch: user.branch,
-      contact: user.contact,
-      upiId: user.upiId,
-      email: user.email,
-      token: generateToken(user._id),
-    });
-  } else {
+  if (!user) {
     res.status(401);
     throw new Error("Invalid email or password");
   }
+
+  if (user.registrationCode || user.registrationCodeExpiration || user.isVerified == false) {
+    res.status(401);
+    throw new Error("Please complete the registration process and verify your email");
+  }
+
+  if (!(await user.comparePassword(password))) {
+    res.status(401);
+    throw new Error("Invalid email or password");
+  }
+
+  res.json({
+    _id: user._id,
+    firstName: user.firstName,
+    lastName: user.lastName,
+    enrollmentNo: user.enrollmentNo,
+    semester: user.semester,
+    branch: user.branch,
+    contact: user.contact,
+    upiId: user.upiId,
+    email: user.email,
+    token: generateToken(user._id),
+  });
 });
+
 
 // @TODO: Add all user controller and search controllers
 
-module.exports = { registerUser, authUser };
+module.exports = { registerUser, authUser, verifyCode };

@@ -1,81 +1,95 @@
-const mongoose = require('mongoose')
-const bcrypt = require('bcryptjs')
-const jwt = require('jsonwebtoken')
+const mongoose = require('mongoose');
+const bcrypt = require('bcryptjs');
+const jwt = require('jsonwebtoken');
 
 const UserSchema = new mongoose.Schema({
-    firstName: {
-        type: String,
-        required: [true, 'Please provide first name'],
-        maxlength: 50,
-        minlength: 3,
-    },
-    lastName: {
-        type: String,
-        required: [true, 'Please provide last name'],
-        maxlength: 50,
-        minlength: 3,
-    },
-    enrollmentNo: {
-        type: String,
-        required: [true, 'Please provide enrollment number'],
-        maxlength: 10,
-        minlength: 10,
-    },
-    semester: {
-        type: Number,
-        required: [true, 'Please provide semester'],
-        maximum: 8,
-        minimum: 1,
-    },
-    branch: {
-        type: String,
-        required: [true, 'Please provide branch'],
-        enum: ['IT', 'IT-BI', 'ECE'],
-    },
-    contact: {
-        type: String,
-        required: [true, 'Please provide contact details'],
-        maxlength: 10,
-        minlength: 10,
-    },
-    upiId: {
-        type: String,
-        required: false,
-    },
-    email: {
-        type: String,
-        required: [true, 'Please provide email'],
-        match: [
-        /^(([^<>()[\]\\.,;:\s@"]+(\.[^<>()[\]\\.,;:\s@"]+)*)|(".+"))@iiita\.ac\.in$/,
-        'Please provide a valid email ending with @iiita.ac.in',
-        ],
-        unique: true,
-    },  
-    password: {
-        type: String,
-        required: [true, 'Please provide password'],
-        minlength: 6,
-    },
-})
+  firstName: {
+    type: String,
+    required: [true, 'Please provide first name'],
+    maxlength: 50,
+    minlength: 3,
+  },
+  lastName: {
+    type: String,
+    required: [true, 'Please provide last name'],
+    maxlength: 50,
+    minlength: 3,
+  },
+  enrollmentNo: {
+    type: String,
+    required: [true, 'Please provide enrollment number'],
+    maxlength: 10,
+    minlength: 10,
+  },
+  semester: {
+    type: Number,
+    required: [true, 'Please provide semester'],
+    maximum: 8,
+    minimum: 1,
+  },
+  branch: {
+    type: String,
+    required: [true, 'Please provide branch'],
+    enum: ['IT', 'IT-BI', 'ECE'],
+  },
+  contact: {
+    type: String,
+    required: [true, 'Please provide contact details'],
+    maxlength: 10,
+    minlength: 10,
+  },
+  upiId: {
+    type: String,
+    required: false,
+  },
+  email: {
+    type: String,
+    required: [true, 'Please provide email'],
+    match: [
+      /^(([^<>()[\]\\.,;:\s@"]+(\.[^<>()[\]\\.,;:\s@"]+)*)|(".+"))@iiita\.ac\.in$/,
+      'Please provide a valid email ending with @iiita.ac.in',
+    ],
+    unique: true,
+  },
+  password: {
+    type: String,
+    required: [true, 'Please provide password'],
+    minlength: 6,
+  },
+  registrationCode: {
+    type: String,
+    required: false,
+  },
+  registrationCodeExpiration: {
+    type: Date,
+    required: false,
+  },
+  isVerified: {
+    type: Boolean, 
+    default: false,
+  }
+});
 
 UserSchema.pre('save', async function () {
-    const salt = await bcrypt.genSalt(10)
-    this.password = await bcrypt.hash(this.password, salt)
-})
+  if (this.isModified('password')) {
+    const salt = await bcrypt.genSalt(10);
+    this.password = await bcrypt.hash(this.password, salt);
+  }
+});
 
 UserSchema.methods.createJWT = function () {
-    return jwt.sign(
-        { userId: this._id, name: this.name },
-        process.env.JWT_SECRET,
-        {
-        expiresIn: process.env.JWT_LIFETIME,
-        }
-    )
-}
+  return jwt.sign(
+    { userId: this._id, name: this.name },
+    process.env.JWT_SECRET,
+    {
+      expiresIn: process.env.JWT_LIFETIME,
+    }
+  );
+};
 
-UserSchema.methods.comparePassword = async function (canditatePassword) {
-    const isMatch = await bcrypt.compare(canditatePassword, this.password)
-    return isMatch
-}
+UserSchema.methods.comparePassword = async function (candidatePassword) {
+  const isMatch = await bcrypt.compare(candidatePassword, this.password);
+  return isMatch;
+};
 
-module.exports = mongoose.model('User', UserSchema)
+module.exports = mongoose.model('User', UserSchema);
