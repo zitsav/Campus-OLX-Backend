@@ -246,24 +246,8 @@ const resetPassword = asyncHandler(async (req, res) => {
   res.status(200).json({ message: 'Password reset successful' });
 });
 
-// @desc    Get user profile
-
-const allUsers = asyncHandler(async (req, res) => {
-  const keyword = req.query.search
-  ? {
-      $or: [
-        { firstName: { $regex: req.query.search, $options: "i" } },
-        { lastName: { $regex: req.query.search, $options: "i" } },
-        { enrollmentNo: { $regex: req.query.search, $options: "i" } },
-      ],
-    }
-  : {};
-
-  const users = await User.find(keyword).find({ _id: { $ne: req.user._id } });
-  res.send(users);
-})
 
 
 // @TODO: Micellaneous conroller functions to be added here
 
-module.exports = { registerUser, authUser,allUsers, verifyCode, resetPassword, forgotPassword };
+module.exports = { registerUser, authUser, verifyCode, resetPassword, forgotPassword };
