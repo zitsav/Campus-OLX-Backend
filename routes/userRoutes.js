@@ -1,5 +1,5 @@
 const express = require("express");
-const { protect,auth} = require("../middleware/authentication");
+const { protect } = require("../middleware/authentication");
 const { allUsers } = require("../controllers/searchController");
 const {authUser,logoutUser} = require("../controllers/sessionController");
 const {
