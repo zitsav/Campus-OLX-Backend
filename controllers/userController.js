@@ -3,6 +3,7 @@ const User = require("../models/User");
 const generateToken = require("../config/generateToken");
 const nodemailer = require('nodemailer');
 const crypto = require('crypto');
+const bcrypt = require('bcryptjs');
 
 // @desc    Register a new user
 
@@ -164,6 +165,87 @@ const authUser = asyncHandler(async (req, res) => {
   });
 });
 
+// @desc forgot password
+
+const forgotPassword = asyncHandler(async (req, res) => {
+  const { email } = req.body;
+
+  const user = await User.findOne({ email });
+
+  if (!user) {
+    res.status(404);
+    throw new Error('User not found');
+  }
+
+  if (user.registrationCode || user.registrationCodeExpiration || user.isVerified == false) {
+    res.status(401);
+    throw new Error("Please complete the regi sendResetTokenToEmail(user.email, resetToken);ation process and verify your email");
+  }
+
+  // Generate a reset token (8-digit alphanumeric code)
+  const resetToken = crypto.randomBytes(4).toString('hex').toUpperCase();
+  const resetTokenExpiration = Date.now() + 10 * 60 * 1000; // Token expires in 10 minutes
+
+  // Save the hashed reset token and expiration time to the user object
+  user.resetPasswordToken = resetToken;
+  user.resetPasswordTokenExpiration = resetTokenExpiration;
+  await user.save();
+
+  // Send the reset token to the user's email (implement the email sending logic using nodemailer)
+  const transporter = nodemailer.createTransport({
+    host: 'smtp.gmail.com',
+    port: 465,
+    secure: true,
+    auth: {
+      user: 'grievanceportaliiita4@gmail.com',
+      pass: 'bryoccqsbhkhnhah',
+    },
+  });
+
+  // Define the email options
+  const mailOptions = {
+    from: 'Campus OLX',
+    to: email,
+    subject: 'Password Reset',
+    text: `Your password reset token is: ${resetToken}`,
+  };
+
+  await transporter.sendMail(mailOptions);
+
+  res.status(200).json({ message: 'Reset token sent to email' });
+});
+
+// @desc reset password
+
+const resetPassword = asyncHandler(async (req, res) => {
+  const { email, token, newPassword } = req.body;
+
+  const user = await User.findOne({ email });
+
+  if (!user) {
+    res.status(404);
+    throw new Error('User not found');
+  }
+
+  if (user.registrationCode || user.registrationCodeExpiration || user.isVerified === false) {
+    res.status(401);
+    throw new Error("Please complete the registration process and verify your email");
+  }
+
+  if (!token || user.resetPasswordToken !== token || user.resetPasswordTokenExpiration < Date.now()) {
+    res.status(400);
+    throw new Error('Invalid or expired reset token');
+  }
+
+  // Set the new hashed password and clear the reset token and expiration
+  user.password = newPassword;
+  user.resetPasswordToken = undefined;
+  user.resetPasswordTokenExpiration = undefined;
+  await user.save();
+
+  res.status(200).json({ message: 'Password reset successful' });
+});
+
 // @desc    Get user profile
 
 const allUsers = asyncHandler(async (req, res) => {
@@ -184,4 +266,4 @@ const allUsers = asyncHandler(async (req, res) => {
 
 // @TODO: Micellaneous conroller functions to be added here
 
-module.exports = { registerUser, authUser,allUsers, verifyCode };
+module.exports = { registerUser, authUser,allUsers, verifyCode, resetPassword, forgotPassword };
