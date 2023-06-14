@@ -4,6 +4,7 @@ const generateToken = require("../config/generateToken");
 const nodemailer = require("nodemailer");
 const crypto = require("crypto");
 const bcrypt = require("bcryptjs");
+const jwt = require("jsonwebtoken");
 
 // @desc    Register a new user
 
@@ -156,7 +157,27 @@ const authUser = asyncHandler(async (req, res) => {
     throw new Error("Invalid email or password");
   }
 
-  res.json({
+  const token = jwt.sign({ userId: user._id }, process.env.JWT_SECRET, {
+    expiresIn: '1d',
+  });
+
+  let oldTokens = user.tokens || [];
+
+  if (oldTokens.length) {
+    oldTokens = oldTokens.filter(t => {
+      const timeDiff = (Date.now() - parseInt(t.signedAt)) / 1000;
+      if (timeDiff < 86400) {
+        return t;
+      }
+    });
+  }
+
+  // will support multple sessions as we'll be storing multiple tokens
+  await User.findByIdAndUpdate(user._id, {
+    tokens: [...oldTokens, { token, signedAt: Date.now().toString() }],
+  });
+
+  const userInfo = {
     _id: user._id,
     firstName: user.firstName,
     lastName: user.lastName,
@@ -166,8 +187,9 @@ const authUser = asyncHandler(async (req, res) => {
     contact: user.contact,
     upiId: user.upiId,
     email: user.email,
-    token: generateToken(user._id),
-  });
+  };
+
+  res.json({ success: true, user: userInfo, token });
 });
 
 // @desc forgot password
