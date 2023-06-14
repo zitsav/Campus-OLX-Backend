@@ -1,8 +1,8 @@
 const express = require("express");
 const { protect } = require("../middleware/authentication");
+const { authUser } = require("../controllers/sessionController");
 const {
   registerUser,
-  authUser,
   verifyCode,
   resetPassword,
   forgotPassword,
