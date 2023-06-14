@@ -4,7 +4,7 @@ const generateToken = require("../config/generateToken");
 const nodemailer = require("nodemailer");
 const crypto = require("crypto");
 const bcrypt = require("bcryptjs");
-const jwt = require("jsonwebtoken");
+
 
 // @desc    Register a new user
 
