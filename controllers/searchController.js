@@ -1,7 +1,7 @@
 const asyncHandler = require("express-async-handler");
 const User = require("../models/User");
 
-// @desc    Get user profile
+// @desc    Get other user profiles
 
 const allUsers = asyncHandler(async (req, res) => {
   try {
