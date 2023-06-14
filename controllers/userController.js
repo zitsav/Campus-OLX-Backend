@@ -163,6 +163,7 @@ const authUser = asyncHandler(async (req, res) => {
 
   let oldTokens = user.tokens || [];
 
+  //check for previous tokens and remove them if they are older than 24 hours
   if (oldTokens.length) {
     oldTokens = oldTokens.filter(t => {
       const timeDiff = (Date.now() - parseInt(t.signedAt)) / 1000;
@@ -211,7 +212,7 @@ const forgotPassword = asyncHandler(async (req, res) => {
   ) {
     res.status(401);
     throw new Error(
-      "Please complete the regi sendResetTokenToEmail(user.email, resetToken);ation process and verify your email"
+      "Please complete the registration process and verify your email"
     );
   }
 
