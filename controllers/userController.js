@@ -246,8 +246,25 @@ const resetPassword = asyncHandler(async (req, res) => {
   res.status(200).json({ message: 'Password reset successful' });
 });
 
+// @desc    Delete user
+
+const deleteUser = asyncHandler(async (req, res) => {
+  const { id } = req.params;
+
+  const user = await User.findById(id);
+
+  if (!user) {
+    res.status(404);
+    throw new Error("User not found");
+  }
+  await user.remove();
+
+  res.json({ message: "User deleted" });
+});
+
+
 
 
 // @TODO: Micellaneous conroller functions to be added here
 
-module.exports = { registerUser, authUser, verifyCode, resetPassword, forgotPassword };
+module.exports = { registerUser, authUser, verifyCode, resetPassword, forgotPassword, deleteUser };
