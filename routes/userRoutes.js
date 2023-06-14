@@ -1,13 +1,13 @@
 const express = require("express");
 const { protect } = require("../middleware/authentication");
 const { allUsers } = require("../controllers/searchController");
+const {authUser} = require("../controllers/sessionController");
 const {
   registerUser,
-  authUser,
   verifyCode,
   resetPassword,
   forgotPassword,
- 
+  deleteUser,
 } = require("../controllers/userController");
 
 const router = express.Router();
@@ -18,6 +18,6 @@ router.post("/login", authUser);
 router.route("/forgotpassword").post(forgotPassword);
 router.route("/reset").post(resetPassword);
 router.route("/").get(protect, allUsers);
-// router.delete("/:id",protect, deleteUser);
+router.delete("/:id",protect, deleteUser);
 
 module.exports = router;

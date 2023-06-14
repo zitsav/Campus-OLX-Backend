@@ -129,44 +129,6 @@ const verifyCode = asyncHandler(async (req, res) => {
 });
 
 
-// @desc    Login user
-
-const authUser = asyncHandler(async (req, res) => {
-  const { email, password } = req.body;
-
-  const user = await User.findOne({ email });
-
-  if (!user) {
-    res.status(401);
-    throw new Error("Invalid email or password");
-  }
-
-  if (user.registrationCode || user.registrationCodeExpiration || user.isVerified == false) {
-    res.status(401);
-    throw new Error("Please complete the registration process and verify your email");
-  }
-
-  if (!(await user.comparePassword(password))) {
-    res.status(401);
-    throw new Error("Invalid email or password");
-  }
-
-  res.json({
-    _id: user._id,
-    firstName: user.firstName,
-    lastName: user.lastName,
-    enrollmentNo: user.enrollmentNo,
-    semester: user.semester,
-    branch: user.branch,
-    contact: user.contact,
-    upiId: user.upiId,
-    email: user.email,
-    token: generateToken(user._id),
-  });
-});
-
-// @desc forgot password
-
 const forgotPassword = asyncHandler(async (req, res) => {
   const { email } = req.body;
 
@@ -246,24 +208,23 @@ const resetPassword = asyncHandler(async (req, res) => {
   res.status(200).json({ message: 'Password reset successful' });
 });
 
-// @desc    Get user profile
+// @desc    Delete user
 
-const allUsers = asyncHandler(async (req, res) => {
-  const keyword = req.query.search
-  ? {
-      $or: [
-        { firstName: { $regex: req.query.search, $options: "i" } },
-        { lastName: { $regex: req.query.search, $options: "i" } },
-        { enrollmentNo: { $regex: req.query.search, $options: "i" } },
-      ],
-    }
-  : {};
+const deleteUser = asyncHandler(async (req, res) => {
+  const { id } = req.params;
 
-  const users = await User.find(keyword).find({ _id: { $ne: req.user._id } });
-  res.send(users);
-})
+  const user = await User.findById(id);
+
+  if (!user) {
+    res.status(404);
+    throw new Error("User not found");
+  }
+  await user.remove();
+
+  res.json({ message: "User deleted" });
+});
 
 
 // @TODO: Micellaneous conroller functions to be added here
 
-module.exports = { registerUser, authUser,allUsers, verifyCode, resetPassword, forgotPassword };
+module.exports = { registerUser, verifyCode, resetPassword, forgotPassword, deleteUser };
