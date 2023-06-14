@@ -30,4 +30,21 @@ const protect = asyncHandler(async (req, res, next) => {
   }
 });
 
+// const auth = asyncHandler(async (req, res, next) => {
+//   try {
+//     const token = req.cookies.token;
+//     const verifyUser = jwt.verify(token, process.env.JWT_SECRET);
+
+//     const user = await User.findOne({ _id: verifyUser._id });
+
+//     req.token = token;
+//     req.user = user;
+
+//     next();
+//   }catch(err){
+//     res.status(401).json({message: "Unauthorized"});
+//   }
+// })
+
+
 module.exports = { protect };
