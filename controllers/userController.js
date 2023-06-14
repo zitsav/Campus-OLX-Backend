@@ -182,6 +182,6 @@ const allUsers = asyncHandler(async (req, res) => {
 })
 
 
-// @TODO: Add all user controller and search controllers
+// @TODO: Micellaneous conroller functions to be added here
 
 module.exports = { registerUser, authUser,allUsers, verifyCode };
