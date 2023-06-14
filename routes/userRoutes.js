@@ -1,7 +1,7 @@
 const express = require("express");
-const { protect } = require("../middleware/authentication");
+const { protect,auth} = require("../middleware/authentication");
 const { allUsers } = require("../controllers/searchController");
-const {authUser} = require("../controllers/sessionController");
+const {authUser,logoutUser} = require("../controllers/sessionController");
 const {
   registerUser,
   verifyCode,
@@ -19,5 +19,6 @@ router.route("/forgotpassword").post(forgotPassword);
 router.route("/reset").post(resetPassword);
 router.route("/").get(protect, allUsers);
 router.delete("/:id",protect, deleteUser);
+router.post("/logout",protect,logoutUser);
 
 module.exports = router;
