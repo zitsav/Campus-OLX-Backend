@@ -44,7 +44,6 @@ const updateUser = asyncHandler(async (req, res) => {
 const getCurrentUserProfile = asyncHandler(async (req, res) => {
   const userId = req.user._id;
 
-  // Assuming you have a method in your User model to fetch the user's profile details
   const user = await User.findById(userId);
 
   if (!user) {
@@ -52,7 +51,6 @@ const getCurrentUserProfile = asyncHandler(async (req, res) => {
     throw new Error("User not found");
   }
 
-  // Access and use the user's profile information as needed
   res.status(200).json({
     _id: user._id,
     firstName: user.firstName,
