@@ -6,6 +6,7 @@ const connectDB = require('./db/connect');
 connectDB();
 const { notFound, errorHandler } = require("./middleware/errorMiddleware");
 const {authentication} = require("./middleware/authentication");
+const productRoutes = require("./routes/productRoutes")
 
 dotenv.config();
 const app = express();
@@ -21,7 +22,7 @@ app.get("/", (req, res) => {
 // })
 
 app.use("/api/user", userRoutes);
-
+app.use("/api/products", productRoutes)
 
 app.use(notFound);
 app.use(errorHandler);
