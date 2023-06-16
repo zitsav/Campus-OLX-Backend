@@ -15,7 +15,8 @@ const allUsers = asyncHandler(async (req, res) => {
         }
       : {};
 
-      const users = await User.find(keyword, "-password -email").find({ _id: { $ne: req.user._id } });
+    const users = await User.find(keyword, "-password -email").find({ _id: { $ne: req.user._id } });
+      //don't show email and password of the user
     res.send(users);
   } catch (error) {
     res.status(500).json({ success: false, message: "Server error" });
