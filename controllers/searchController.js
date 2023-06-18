@@ -8,8 +8,7 @@ const allUsers = asyncHandler(async (req, res) => {
     const keyword = req.query.search
       ? {
           $or: [
-            { firstName: { $regex: req.query.search, $options: "i" } },
-            { lastName: { $regex: req.query.search, $options: "i" } },
+            { name: { $regex: req.query.search, $options: "i" } },
             { enrollmentNo: { $regex: req.query.search, $options: "i" } },
           ],
         }

@@ -5,7 +5,7 @@ const asyncHandler = require("express-async-handler");
 
 const updateUser = asyncHandler(async (req, res) => {
   const { id } = req.params;
-  const { firstName, lastName, contact, enrollmentNo, semester, upiId } =
+  const { name, contact, enrollmentNo, semester, upiId } =
     req.body;
 
   const user = await User.findById(id);
@@ -16,8 +16,7 @@ const updateUser = asyncHandler(async (req, res) => {
   }
 
   // Update the user's details
-  user.firstName = firstName || user.firstName;
-  user.lastName = lastName || user.lastName;
+  user.name = name || user.name;
   user.contact = contact || user.contact;
   user.enrollmentNo = enrollmentNo || user.enrollmentNo;
   user.semester = semester || user.semester;
@@ -27,8 +26,7 @@ const updateUser = asyncHandler(async (req, res) => {
 
   res.status(200).json({
     _id: updatedUser._id,
-    firstName: updatedUser.firstName,
-    lastName: updatedUser.lastName,
+    name: updatedUser.name,
     contact: updatedUser.contact,
     enrollmentNo: updatedUser.enrollmentNo,
     semester: updatedUser.semester,
@@ -53,8 +51,7 @@ const getCurrentUserProfile = asyncHandler(async (req, res) => {
 
   res.status(200).json({
     _id: user._id,
-    firstName: user.firstName,
-    lastName: user.lastName,
+    name: user.name,
     email: user.email,
     contact: user.contact,
     enrollmentNo: user.enrollmentNo,

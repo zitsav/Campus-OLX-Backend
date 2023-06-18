@@ -32,8 +32,7 @@ const authUser = asyncHandler(async (req, res) => {
   // res.header('Authorization', generateToken(user._id));
   res.json({
     _id: user._id,
-    firstName: user.firstName,
-    lastName: user.lastName,
+    name: user.name,
     enrollmentNo: user.enrollmentNo,
     semester: user.semester,
     branch: user.branch,
