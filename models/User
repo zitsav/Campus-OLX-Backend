@@ -1,34 +1,34 @@
-const mongoose = require('mongoose');
-const bcrypt = require('bcryptjs');
-const jwt = require('jsonwebtoken');
+const mongoose = require("mongoose");
+const bcrypt = require("bcryptjs");
+const jwt = require("jsonwebtoken");
 
 const UserSchema = new mongoose.Schema({
   name: {
     type: String,
-    required: [true, 'Please provide first name'],
+    required: [true, "Please provide first name"],
     maxlength: 50,
     minlength: 3,
   },
   enrollmentNo: {
     type: String,
-    required: [true, 'Please provide enrollment number'],
+    required: [true, "Please provide enrollment number"],
     maxlength: 10,
     minlength: 10,
   },
   semester: {
     type: Number,
-    required: [true, 'Please provide semester'],
-    maximum: 8,
-    minimum: 1,
+    required: [true, "Please provide semester"],
+    max: 8,
+    min: 1,
   },
   branch: {
     type: String,
-    required: [true, 'Please provide branch'],
-    enum: ['IT', 'IT-BI', 'ECE'],
+    required: [true, "Please provide branch"],
+    enum: ["IT", "IT-BI", "ECE"],
   },
   contact: {
     type: String,
-    required: [true, 'Please provide contact details'],
+    required: [true, "Please provide contact details"],
     maxlength: 10,
     minlength: 10,
   },
@@ -38,17 +38,28 @@ const UserSchema = new mongoose.Schema({
   },
   email: {
     type: String,
-    required: [true, 'Please provide email'],
+    required: [true, "Please provide email"],
     match: [
       /^(([^<>()[\]\\.,;:\s@"]+(\.[^<>()[\]\\.,;:\s@"]+)*)|(".+"))@iiita\.ac\.in$/,
-      'Please provide a valid email ending with @iiita.ac.in',
+      "Please provide a valid email ending with @iiita.ac.in",
     ],
     unique: true,
   },
   password: {
     type: String,
-    required: [true, 'Please provide password'],
+    required: [true, "Please provide password"],
     minlength: 6,
+  },
+  profilePicture: {
+    publicId: {
+      type: String,
+      required: false,
+    },
+    url: {
+      type: String,
+      default:
+        "https://www.google.com/url?sa=i&url=https%3A%2F%2Fwww.freepik.com%2Fpremium-vector%2Faccount-icon-user-icon-vector-graphics_39674128.htm&psig=AOvVaw3OWUvsf9EcBmSQ73epEKtr&ust=1687536648749000&source=images&cd=vfe&ved=0CBEQjRxqFwoTCMCgwIai1_8CFQAAAAAdAAAAABAE",
+    },
   },
   registrationCode: {
     type: String,
@@ -67,16 +78,17 @@ const UserSchema = new mongoose.Schema({
     required: false,
   },
   isVerified: {
-    type: Boolean, 
+    type: Boolean,
     default: false,
   },
 });
 
-UserSchema.pre('save', async function () {
-  if (this.isModified('password')) {
+UserSchema.pre("save", async function (next) {
+  if (this.isModified("password")) {
     const salt = await bcrypt.genSalt(10);
     this.password = await bcrypt.hash(this.password, salt);
   }
+  next();
 });
 
 UserSchema.methods.createJWT = function () {
@@ -97,4 +109,4 @@ UserSchema.methods.comparePassword = async function (candidatePassword) {
   return isMatch;
 };
 
-module.exports = mongoose.model('User', UserSchema);
+module.exports = mongoose.model("User", UserSchema);

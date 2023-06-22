@@ -39,6 +39,7 @@ const authUser = asyncHandler(async (req, res) => {
     contact: user.contact,
     upiId: user.upiId,
     email: user.email,
+    profilePicture: user.profilePicture,
     token: generateToken(user._id),
   });
 });
