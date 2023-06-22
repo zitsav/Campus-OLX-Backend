@@ -9,8 +9,7 @@ const bcrypt = require('bcryptjs');
 
 const registerUser = asyncHandler(async (req, res) => {
   const {
-    firstName,
-    lastName,
+    name,
     enrollmentNo,
     semester,
     branch,
@@ -21,8 +20,7 @@ const registerUser = asyncHandler(async (req, res) => {
   } = req.body;
 
   if (
-    !firstName ||
-    !lastName ||
+    !name ||
     !enrollmentNo ||
     !semester ||
     !branch ||
@@ -44,8 +42,7 @@ const registerUser = asyncHandler(async (req, res) => {
   const code = crypto.randomBytes(3).toString('hex').toUpperCase();
 
   const user = await User.create({
-    firstName,
-    lastName,
+    name,
     enrollmentNo,
     semester,
     branch,
@@ -82,8 +79,7 @@ const registerUser = asyncHandler(async (req, res) => {
 
     res.status(201).json({
       _id: user._id,
-      firstName: user.firstName,
-      lastName: user.lastName,
+      name: user.name,
       enrollmentNo: user.enrollmentNo,
       semester: user.semester,
       branch: user.branch,
@@ -96,6 +92,15 @@ const registerUser = asyncHandler(async (req, res) => {
     res.status(400);
     throw new Error('Failed to create User');
   }
+
+  // Delete the user if the verification code expires
+  setTimeout(async () => {
+    const expiredUser = await User.findOne({ email });
+    if (expiredUser && expiredUser.registrationCodeExpiration < Date.now()) {
+      await expiredUser.remove();
+      console.log('User deleted:', expiredUser.email);
+    }
+  }, 10 * 60 * 1000);
 });
 
 // @desc    Verify the otp
