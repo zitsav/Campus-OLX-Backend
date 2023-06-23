@@ -3,6 +3,7 @@ const User = require("../models/User");
 const generateToken = require("../config/generateToken");
 const nodemailer = require('nodemailer');
 const crypto = require('crypto');
+const cloudinary = require('cloudinary').v2;
 const bcrypt = require('bcryptjs');
 
 // @desc    Register a new user
@@ -225,6 +226,14 @@ const deleteUser = asyncHandler(async (req, res) => {
     res.status(404);
     throw new Error("User not found");
   }
+   // Delete user's images from Cloudinary
+   const deletePromises = user.profilePicture.map((image) => {
+    return cloudinary.uploader.destroy(image.publicId);
+  });
+
+  // Wait for all images to be deleted
+  await Promise.all(deletePromises);
+
   await user.remove();
 
   res.json({ message: "User deleted" });
