@@ -112,24 +112,28 @@ const editProduct = asyncHandler(async (req, res) => {
 
 const uploadProductImage = asyncHandler(async (req, res) => {
   if (!req.files || !req.files.image) {
-    throw new BadRequestError("Image file not found");
+    throw new BadRequestError("Image files not found");
   }
 
-  const imageFile = req.files.image;
+  const imageFiles = req.files.image;
 
   try {
-    const result = await cloudinary.uploader.upload(imageFile.tempFilePath, {
-      use_filename: true,
-      folder: 'sample-uploads'
+    const uploadPromises = imageFiles.map(async (file) => {
+      const result = await cloudinary.uploader.upload(file.tempFilePath, {
+        use_filename: true,
+        folder: 'sample-uploads'
+      });
+      // Delete the temporary file
+      fs.unlinkSync(file.tempFilePath);
+      return result.secure_url;
     });
 
-    // Delete the temporary file
-    fs.unlinkSync(imageFile.tempFilePath);
+    const uploadedImages = await Promise.all(uploadPromises);
 
-    res.status(StatusCodes.OK).json({ image: { src: result.secure_url } });
+    res.status(StatusCodes.OK).json({ images: uploadedImages });
   } catch (error) {
     console.log(error)
-    res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({error: error.message});
+    res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({ error: error.message });
   }
 });
 
