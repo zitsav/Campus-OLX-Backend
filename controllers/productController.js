@@ -1,7 +1,9 @@
+const fs = require("fs");
+const cloudinary = require("cloudinary").v2;
 const User = require("../models/User");
 const asyncHandler = require("express-async-handler");
 const Product = require("../models/Product");
-const cloudinary = require('cloudinary').v2;
+const path = require('path');
 const { StatusCodes } = require("http-status-codes");
 const {
   BadRequestError,
@@ -23,53 +25,19 @@ const getAllProductsOfUser = asyncHandler(async (req, res) => {
 
 const createProduct = async (req, res, next) => {
   try {
-    // Get the product data from the request body
     const user = req.user;
-    const { name, description, price, category, createdBy, isSold } = req.body;
+    req.body.createdBy = user
 
-    // Get the uploaded images from the request files
-    const images = req.files;
+    const product = await Product.create(req.body);
 
-    // Upload images to Cloudinary
-    const uploadPromises = images.map((image) => {
-      return cloudinary.uploader.upload(image.path, {
-        folder: "products",
-      });
-    });
-
-    // Wait for all images to be uploaded
-    const uploadedImages = await Promise.all(uploadPromises);
-
-    // Extract the publicIds and URLs of the uploaded images
-    const imageUrls = uploadedImages.map((image) => {
-      return { publicId: image.public_id, url: image.secure_url };
-    });
-
-    // Create the product
-    const product = new Product({
-      name,
-      description,
-      price,
-      category,
-      createdBy : user._id,
-      isSold,
-      images: imageUrls,
-    });
-
-    // Save the product to the database
-    await product.save();
-
-    // Return the product in the response
-    res.status(201).json({
-      status: "success",
-      data: {
-        product,
-      },
+    res.status(StatusCodes.CREATED).json({
+      product
     });
   } catch (error) {
     next(error);
   }
 };
+
 const deleteProduct = asyncHandler(async (req, res) => {
   try {
     const user = req.user;
@@ -104,12 +72,9 @@ const deleteProduct = asyncHandler(async (req, res) => {
 
     res.status(StatusCodes.OK).json({ message: "Product deleted successfully" });
   } catch (error) {
-    // Handle the error and send an appropriate response
     res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({ error: error.message });
   }
 });
-
-
 
 const editProduct = asyncHandler(async (req, res) => {
   try {
@@ -141,14 +106,32 @@ const editProduct = asyncHandler(async (req, res) => {
     );
     res.status(StatusCodes.OK).json({ product: updatedProduct });
   } catch (error) {
-    // Handle the error and send an appropriate response
-    res
-      .status(StatusCodes.INTERNAL_SERVER_ERROR)
-      .json({ error: error.message });
+    res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({ error: error.message });
   }
 });
 
+const uploadProductImage = asyncHandler(async (req, res) => {
+  if (!req.files || !req.files.image) {
+    throw new BadRequestError("Image file not found");
+  }
 
+  const imageFile = req.files.image;
+
+  try {
+    const result = await cloudinary.uploader.upload(imageFile.tempFilePath, {
+      use_filename: true,
+      folder: 'sample-uploads'
+    });
+
+    // Delete the temporary file
+    fs.unlinkSync(imageFile.tempFilePath);
+
+    res.status(StatusCodes.OK).json({ image: { src: result.secure_url } });
+  } catch (error) {
+    console.log(error)
+    res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({error: error.message});
+  }
+});
 
 module.exports = {
   getAllProducts,
@@ -156,4 +139,5 @@ module.exports = {
   deleteProduct,
   editProduct,
   createProduct,
+  uploadProductImage,
 };

@@ -2,7 +2,7 @@ const express = require("express");
 const { protect } = require("../middleware/authentication");
 const { allUsers } = require("../controllers/searchController");
 const { updateUser, getCurrentUserProfile } = require("../controllers/userController");
-const uploadUserPhoto = require("../middleware/uploadUserPhoto");
+// const uploadUserPhoto = require("../middleware/uploadUserPhoto");
 const {authUser,logoutUser} = require("../controllers/sessionController");
 const {
   registerUser,
@@ -27,7 +27,7 @@ router.post("/login", authUser);
 
 
 // @TODO these ones stay here
-router.put('/updateProfile/:id', protect,uploadUserPhoto, updateUser);
+router.put('/updateProfile/:id', protect, updateUser);
 router.get("/profile",protect,getCurrentUserProfile);
 router.route("/").get(protect, allUsers);
 
