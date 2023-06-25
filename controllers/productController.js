@@ -76,6 +76,7 @@ const deleteProduct = asyncHandler(async (req, res) => {
   }
 });
 
+
 const editProduct = asyncHandler(async (req, res) => {
   try {
     const user = req.user;
@@ -125,17 +126,21 @@ const uploadProductImage = asyncHandler(async (req, res) => {
       });
       // Delete the temporary file
       fs.unlinkSync(file.tempFilePath);
-      return result.secure_url;
+      return {
+        publicId: result.public_id,
+        url: result.secure_url,
+      };
     });
 
     const uploadedImages = await Promise.all(uploadPromises);
 
     res.status(StatusCodes.OK).json({ images: uploadedImages });
   } catch (error) {
-    console.log(error)
+    console.log(error);
     res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({ error: error.message });
   }
 });
+
 
 module.exports = {
   getAllProducts,
