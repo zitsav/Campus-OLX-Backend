@@ -78,7 +78,7 @@ const registerUser = asyncHandler(async (req, res) => {
     //@desc Send the email
     await transporter.sendMail(mailOptions);
 
-    // Schedule the deletion of the user after 10 minutes
+    // Schedule deletion of the user after 10 minutes
     setTimeout(async () => {
       const user = await User.findById(user._id);
       if (user && !user.isVerified) {
