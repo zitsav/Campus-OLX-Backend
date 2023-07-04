@@ -10,6 +10,7 @@ const {
   resetPassword,
   forgotPassword,
   deleteUser,
+  refreshExpiredToken
 } = require("../controllers/authController");
 
 const router = express.Router();

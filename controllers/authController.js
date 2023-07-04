@@ -78,6 +78,16 @@ const registerUser = asyncHandler(async (req, res) => {
     //@desc Send the email
     await transporter.sendMail(mailOptions);
 
+    // Schedule the deletion of the user after 10 minutes
+    setTimeout(async () => {
+      const user = await User.findById(user._id);
+      if (user && !user.isVerified) {
+        // Delete the user from the database
+        await user.remove();
+        console.log(`Deleted user with ID ${user._id}`);
+      }
+    }, 10 * 60 * 1000);
+
     res.status(201).json({
       _id: user._id,
       name: user.name,
@@ -94,16 +104,8 @@ const registerUser = asyncHandler(async (req, res) => {
     res.status(400);
     throw new Error('Failed to create User');
   }
-
-  // Delete the user if the verification code expires
-  setTimeout(async () => {
-    const expiredUser = await User.findOne({ email });
-    if (expiredUser && expiredUser.registrationCodeExpiration < Date.now()) {
-      await expiredUser.remove();
-      console.log('User deleted:', expiredUser.email);
-    }
-  }, 10 * 60 * 1000);
 });
+
 
 // @desc    Verify the otp
 
@@ -239,7 +241,26 @@ const deleteUser = asyncHandler(async (req, res) => {
   res.json({ message: "User deleted" });
 });
 
+// Middleware to refresh token if it expires before verification
+const refreshExpiredToken = async (req, res, next) => {
+  try {
+    const { email } = req.body;
+
+    // Check if the email exists in the database
+    const user = await User.findOne({ email });
+
+    if (user && !user.isVerified) {
+      // If the user exists but is not verified yet, refresh the token and send it in the response
+      res.status(200).json({ token: generateToken(user._id) });
+    } else {
+      next();
+    }
+  } catch (error) {
+    res.status(500).json({ error: 'Token refresh failed' });
+  }
+};
+
 
 // @TODO: Micellaneous conroller functions to be added here
 
-module.exports = { registerUser, verifyCode, resetPassword, forgotPassword, deleteUser };
+module.exports = { registerUser, verifyCode, resetPassword, forgotPassword, deleteUser, refreshExpiredToken };

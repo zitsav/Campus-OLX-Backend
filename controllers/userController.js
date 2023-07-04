@@ -46,35 +46,46 @@ const updateUser = asyncHandler(async (req, res, next) => {
 
 const uploadProfilePicture = asyncHandler(async (req, res) => {
   if (!req.files || !req.files.image) {
-    throw new BadRequestError("Image files not found");
+    throw new BadRequestError("Image file not found");
   }
 
-  const imageFiles = Array.isArray(req.files.image) ? req.files.image : [req.files.image];
+  const imageFile = req.files.image;
 
   try {
-    const uploadPromises = imageFiles.map(async (file) => {
-      const result = await cloudinary.uploader.upload(file.tempFilePath, {
-        use_filename: true,
-        folder: 'sample-uploads'
-      });
-      // Delete the temporary file
-      fs.unlinkSync(file.tempFilePath);
-      return {
-        publicId: result.public_id,
-        url: result.secure_url
-      };
+    const user = req.user;
+
+    // Delete the existing profile picture if it exists
+    if (user.profilePicture && user.profilePicture.publicId) {
+      await cloudinary.uploader.destroy(user.profilePicture.publicId);
+    }
+
+    // Upload the new profile picture
+    const result = await cloudinary.uploader.upload(imageFile.tempFilePath, {
+      use_filename: true,
+      folder: 'profile-pictures'
     });
 
-    const uploadedImages = await Promise.all(uploadPromises);
+    const image = {
+      publicId: result.public_id,
+      url: result.secure_url
+    };
 
-    const profilePicture = uploadedImages[0]; // Assuming only one profile picture is uploaded
+    // Delete the temporary file
+    fs.unlinkSync(imageFile.tempFilePath);
 
-    res.status(StatusCodes.OK).json({ profilePicture });
+    // Update the user's profile picture
+    user.profilePicture = image;
+    await user.save();
+
+    res.status(StatusCodes.OK).json({ image: { profilePicture: image } });
   } catch (error) {
     console.log(error);
     res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({ error: error.message });
   }
 });
+
+
+
 
 // @desc    Get current user details
 

@@ -4,10 +4,15 @@ dotenv.config();
 require('express-async-errors');
 const cloudinary = require('cloudinary').v2
 cloudinary.config({
-  cloud_name:"drkrjzxjz",
-  api_key:"836592262896224",
-  api_secret:"PMF75CM2mymuK_5mQHUGf4eI5Qs"
+  cloud_name:"dvavgtziq",
+  api_key:"482957252149832",
+  api_secret:"9kDZs96oREgSG-Eyvz9Wt6xdB70"
 })
+// cloudinary.config({
+//   cloud_name:"drkrjzxjz",
+//   api_key:"836592262896224",
+//   api_secret:"PMF75CM2mymuK_5mQHUGf4eI5Qs"
+// })
 const fileUpload = require('express-fileupload')
 const { notFound, errorHandler } = require("./middleware/errorMiddleware");
 const productRoutes = require("./routes/productRoutes")
