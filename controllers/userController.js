@@ -54,7 +54,7 @@ const uploadProfilePicture = asyncHandler(async (req, res) => {
   try {
     const user = req.user;
 
-    // Delete the existing profile picture if it exists
+    // Delete the existing profile picture if it exist
     if (user.profilePicture && user.profilePicture.publicId) {
       await cloudinary.uploader.destroy(user.profilePicture.publicId);
     }
