@@ -24,6 +24,10 @@ const updateUser = asyncHandler(async (req, res, next) => {
       throw new BadRequestError("Something went wrong");
     }
 
+    if (updatedData.password) {
+      throw new BadRequestError("Cannot update password through this endpoint");
+    }
+
     const foundUser = await User.findOneAndUpdate(
       { _id: userId },
       updatedData,
@@ -43,6 +47,7 @@ const updateUser = asyncHandler(async (req, res, next) => {
     res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({ error: error.message });
   }
 });
+
 
 const uploadProfilePicture = asyncHandler(async (req, res) => {
   if (!req.files || !req.files.image) {
