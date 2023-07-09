@@ -14,7 +14,7 @@ dotenv.config();
 
 // @desc    Update user details
 
-const updateUser = asyncHandler(async (req, res, next) => {
+const updateUser = asyncHandler(async (req, res) => {
   try {
     const { user } = req;
     const { id: userId } = req.params;
@@ -42,7 +42,22 @@ const updateUser = asyncHandler(async (req, res, next) => {
       throw new UnauthenticatedError("User is not permitted to edit this profile");
     }
 
-    res.status(StatusCodes.OK).json({ user: foundUser });
+    const formattedUser = {
+      profilePicture: foundUser.profilePicture,
+      isVerified: foundUser.isVerified,
+      _id: foundUser._id,
+      name: foundUser.name,
+      enrollmentNo: foundUser.enrollmentNo,
+      semester: foundUser.semester,
+      branch: foundUser.branch,
+      contact: foundUser.contact,
+      upiId: foundUser.upiId,
+      email: foundUser.email,
+      password: foundUser.password,
+      __v: foundUser.__v,
+    };
+
+    res.status(StatusCodes.OK).json(formattedUser);
   } catch (error) {
     res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({ error: error.message });
   }
@@ -82,7 +97,7 @@ const uploadProfilePicture = asyncHandler(async (req, res) => {
     user.profilePicture = image;
     await user.save();
 
-    res.status(StatusCodes.OK).json({ image: { profilePicture: image } });
+    res.status(StatusCodes.OK).json({ profilePicture: image });
   } catch (error) {
     console.log(error);
     res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({ error: error.message });

@@ -242,25 +242,25 @@ const deleteUser = asyncHandler(async (req, res) => {
 });
 
 // Middleware to refresh token if it expires before verification
-const refreshExpiredToken = async (req, res, next) => {
-  try {
-    const { email } = req.body;
+// const refreshExpiredToken = async (req, res, next) => {
+//   try {
+//     const { email } = req.body;
 
-    // Check if the email exists in the database
-    const user = await User.findOne({ email });
+//     // Check if the email exists in the database
+//     const user = await User.findOne({ email });
 
-    if (user && !user.isVerified) {
-      // If the user exists but is not verified yet, refresh the token and send it in the response
-      res.status(200).json({ token: generateToken(user._id) });
-    } else {
-      next();
-    }
-  } catch (error) {
-    res.status(500).json({ error: 'Token refresh failed' });
-  }
-};
+//     if (user && !user.isVerified) {
+//       // If the user exists but is not verified yet, refresh the token and send it in the response
+//       res.status(200).json({ token: generateToken(user._id) });
+//     } else {
+//       next();
+//     }
+//   } catch (error) {
+//     res.status(500).json({ error: 'Token refresh failed' });
+//   }
+// };
 
 
 // @TODO: Micellaneous conroller functions to be added here
 
-module.exports = { registerUser, verifyCode, resetPassword, forgotPassword, deleteUser, refreshExpiredToken };
+module.exports = { registerUser, verifyCode, resetPassword, forgotPassword, deleteUser };

@@ -238,6 +238,6 @@ module.exports = {
   editProduct,
   createProduct,
   uploadProductImage,
-  searchByCategory
+  searchByCategory,
   getProductById
 };
