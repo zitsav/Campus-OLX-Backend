@@ -141,6 +141,17 @@ const uploadProductImage = asyncHandler(async (req, res) => {
   }
 });
 
+const searchByCategory = asyncHandler(async (req, res) => {
+  const { category } = req.query;
+  console.log(req.query);
+  if (!category) {
+    throw new BadRequestError("Category parameter is required");
+  }
+
+  const products = await Product.find({ category }).sort("createdAt");
+
+  res.status(StatusCodes.OK).json({ count: products.length, products });
+})
 
 module.exports = {
   getAllProducts,
@@ -149,4 +160,5 @@ module.exports = {
   editProduct,
   createProduct,
   uploadProductImage,
+  searchByCategory
 };

@@ -7,7 +7,8 @@ const {
   deleteProduct,
   editProduct,
   createProduct,
-  uploadProductImage
+  uploadProductImage,
+  searchByCategory
 } = require('../controllers/productController');
 
 const router = express.Router();
@@ -16,7 +17,7 @@ const router = express.Router();
 router.route("/").get(getAllProducts).post(protect, createProduct);
 router.route("/:id").put(protect, editProduct).delete(protect, deleteProduct);
 router.post("/upload", protect, uploadProductImage);
-
+router.route("/filter").get(protect,searchByCategory);
 router.get("/user", protect, getAllProductsOfUser);
 
 module.exports = router;
