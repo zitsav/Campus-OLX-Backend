@@ -13,7 +13,62 @@ const {
 
 const getAllProducts = asyncHandler(async (req, res) => {
   const products = await Product.find().sort("createdAt");
-  res.status(StatusCodes.OK).json({ count: products.length, products });
+
+  const formattedProducts = products.map((product) => {
+    const { __v, _id, category, createdAt, createdBy, description, images, isSold, name, price} = product;
+
+    const formattedImages = images.map((image) => {
+      const { publicId, url } = image;
+      return { publicId, url };
+    });
+
+    return {
+      __v,
+      _id,
+      category,
+      createdAt,
+      createdBy,
+      description,
+      images: formattedImages,
+      isSold,
+      name,
+      price,
+    };
+  });
+
+  res.status(StatusCodes.OK).json({ count: formattedProducts.length, products: formattedProducts });
+});
+
+const getProductById = asyncHandler(async (req, res) => {
+  const productId = req.params.id;
+  const product = await Product.findById(productId);
+
+  if (!product) {
+    res.status(StatusCodes.NOT_FOUND).json({ message: 'Product not found' });
+    return;
+  }
+
+  const { __v, _id, category, createdAt, createdBy, description, images, isSold, name, price } = product;
+
+  const formattedImages = images.map((image) => {
+    const { publicId, url } = image;
+    return { publicId, url };
+  });
+
+  const formattedProduct = {
+    __v,
+    _id,
+    category,
+    createdAt,
+    createdBy,
+    description,
+    images: formattedImages,
+    isSold,
+    name,
+    price,
+  };
+
+  res.status(StatusCodes.OK).json(formattedProduct);
 });
 
 const getAllProductsOfUser = asyncHandler(async (req, res) => {
@@ -25,13 +80,21 @@ const getAllProductsOfUser = asyncHandler(async (req, res) => {
 
 const createProduct = async (req, res, next) => {
   try {
-    const user = req.user;
-    req.body.createdBy = user
+    const userId = req.user._id;
 
-    const product = await Product.create(req.body);
+    const product = await Product.create({ ...req.body, createdBy: userId });
 
     res.status(StatusCodes.CREATED).json({
-      product
+        __v: product.__v,
+        _id: product._id,
+        category: product.category,
+        createdAt: product.createdAt,
+        createdBy: product.createdBy._id,
+        description: product.description,
+        images: product.images,
+        isSold: product.isSold,
+        name: product.name,
+        price: product.price
     });
   } catch (error) {
     next(error);
@@ -105,7 +168,22 @@ const editProduct = asyncHandler(async (req, res) => {
       updatedData,
       { new: true }
     );
-    res.status(StatusCodes.OK).json({ product: updatedProduct });
+
+    const formattedProduct = {
+      isSold: updatedProduct.isSold,
+      _id: updatedProduct._id,
+      name: updatedProduct.name,
+      description: updatedProduct.description,
+      category: updatedProduct.category,
+      price: updatedProduct.price,
+      images: updatedProduct.images,
+      createdBy: updatedProduct.createdBy,
+      createdAt: updatedProduct.createdAt,
+      updatedAt: updatedProduct.updatedAt,
+      __v: updatedProduct.__v,
+    };
+
+    res.status(StatusCodes.OK).json(formattedProduct);
   } catch (error) {
     res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({ error: error.message });
   }
@@ -161,4 +239,5 @@ module.exports = {
   createProduct,
   uploadProductImage,
   searchByCategory
+  getProductById
 };
