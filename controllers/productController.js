@@ -79,8 +79,9 @@ const getAllProductsOfUser = asyncHandler(async (req, res) => {
 });
 
 const createProduct = async (req, res, next) => {
+  console.log(req)
   try {
-    const userId = req.user._id;
+    const userId = req.user._id
 
     const product = await Product.create({ ...req.body, createdBy: userId });
 
@@ -194,6 +195,8 @@ const uploadProductImage = asyncHandler(async (req, res) => {
     throw new BadRequestError("Image files not found");
   }
 
+  console.log(req);
+
   const imageFiles = req.files.image;
 
   try {
@@ -211,8 +214,8 @@ const uploadProductImage = asyncHandler(async (req, res) => {
     });
 
     const uploadedImages = await Promise.all(uploadPromises);
-
-    res.status(StatusCodes.OK).json({ images: uploadedImages });
+    console.log(uploadedImages)
+    res.status(StatusCodes.OK).json(uploadedImages);
   } catch (error) {
     console.log(error);
     res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({ error: error.message });
