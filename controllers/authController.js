@@ -229,12 +229,12 @@ const deleteUser = asyncHandler(async (req, res) => {
     throw new Error("User not found");
   }
    // Delete user's images from Cloudinary
-   const deletePromises = user.profilePicture.map((image) => {
-    return cloudinary.uploader.destroy(image.publicId);
-  });
+  //  const deletePromises = user.profilePicture.map((image) => {
+  //   return cloudinary.uploader.destroy(image.publicId);
+  // });
 
   // Wait for all images to be deleted
-  await Promise.all(deletePromises);
+  // await Promise.all(deletePromises);
 
   await user.remove();
 

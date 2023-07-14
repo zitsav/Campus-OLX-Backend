@@ -50,10 +50,10 @@ const getProductById = asyncHandler(async (req, res) => {
 
   const { __v, _id, category, createdAt, createdBy, description, images, isSold, name, price } = product;
 
-  const formattedImages = images.map((image) => {
-    const { publicId, url } = image;
-    return { publicId, url };
-  });
+  // const formattedImages = images.map((image) => {
+  //   const { publicId, url } = image;
+  //   return { publicId, url };
+  // });
 
   const formattedProduct = {
     __v,
@@ -62,7 +62,7 @@ const getProductById = asyncHandler(async (req, res) => {
     createdAt,
     createdBy,
     description,
-    images: formattedImages,
+    images,
     isSold,
     name,
     price,
@@ -124,12 +124,12 @@ const deleteProduct = asyncHandler(async (req, res) => {
     }
 
     // Delete images from Cloudinary
-    const deletePromises = product.images.map((image) => {
-      return cloudinary.uploader.destroy(image.publicId);
-    });
+    // const deletePromises = product.images.map((image) => {
+    //   return cloudinary.uploader.destroy(image.publicId);
+    // });
 
     // Wait for all images to be deleted
-    await Promise.all(deletePromises);
+    // await Promise.all(deletePromises);
 
     // Delete the product from the database
     await product.remove();

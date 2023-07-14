@@ -51,15 +51,9 @@ const UserSchema = new mongoose.Schema({
     minlength: 6,
   },
   profilePicture: {
-    publicId: {
-      type: String,
-      required: false,
-    },
-    url: {
-      type: String,
-      default:
-        "https://www.google.com/url?sa=i&url=https%3A%2F%2Fwww.freepik.com%2Fpremium-vector%2Faccount-icon-user-icon-vector-graphics_39674128.htm&psig=AOvVaw3OWUvsf9EcBmSQ73epEKtr&ust=1687536648749000&source=images&cd=vfe&ved=0CBEQjRxqFwoTCMCgwIai1_8CFQAAAAAdAAAAABAE",
-    },
+    type: String,
+    default:
+      "https://www.google.com/url?sa=i&url=https%3A%2F%2Fwww.freepik.com%2Fpremium-vector%2Faccount-icon-user-icon-vector-graphics_39674128.htm&psig=AOvVaw3OWUvsf9EcBmSQ73epEKtr&ust=1687536648749000&source=images&cd=vfe&ved=0CBEQjRxqFwoTCMCgwIai1_8CFQAAAAAdAAAAABAE",
   },
   registrationCode: {
     type: String,
