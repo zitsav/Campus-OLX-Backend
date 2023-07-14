@@ -12,7 +12,7 @@ const {
 } = require("../errors");
 
 const getAllProducts = asyncHandler(async (req, res) => {
-  const products = await Product.find().sort("createdAt");
+  const products = await Product.find().sort({ createdAt: -1 });
 
   const formattedProducts = products.map((product) => {
     const { __v, _id, category, createdAt, createdBy, description, images, isSold, name, price } = product;
@@ -68,7 +68,7 @@ const getProductById = asyncHandler(async (req, res) => {
 
 const getAllProductsOfUser = asyncHandler(async (req, res) => {
   const products = await Product.find({ createdBy: req.user._id }).sort(
-    "createdAt"
+    { createdAt: -1 }
   );
 
   const formattedProducts = products.map((product) => {
@@ -243,7 +243,7 @@ const searchByCategory = asyncHandler(async (req, res) => {
     throw new BadRequestError("Category parameter is required");
   }
 
-  const products = await Product.find({ category }).sort("createdAt");
+  const products = await Product.find({ category }).sort({ createdAt: -1 });
 
   res.status(StatusCodes.OK).json({ count: products.length, products });
 })
