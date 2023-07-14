@@ -15,12 +15,7 @@ const getAllProducts = asyncHandler(async (req, res) => {
   const products = await Product.find().sort("createdAt");
 
   const formattedProducts = products.map((product) => {
-    const { __v, _id, category, createdAt, createdBy, description, images, isSold, name, price} = product;
-
-    // const formattedImages = images.map((image) => {
-    //   const { publicId, url } = image;
-    //   return { publicId, url };
-    // });
+    const { __v, _id, category, createdAt, createdBy, description, images, isSold, name, price } = product;
 
     return {
       __v,
@@ -36,7 +31,7 @@ const getAllProducts = asyncHandler(async (req, res) => {
     };
   });
 
-  res.status(StatusCodes.OK).json({ formattedProducts });
+  res.status(StatusCodes.OK).json(formattedProducts);
 });
 
 const getProductById = asyncHandler(async (req, res) => {
@@ -77,12 +72,7 @@ const getAllProductsOfUser = asyncHandler(async (req, res) => {
   );
 
   const formattedProducts = products.map((product) => {
-    const { __v, _id, category, createdAt, createdBy, description, images, isSold, name, price} = product;
-
-    // const formattedImages = images.map((image) => {
-    //   const { publicId, url } = image;
-    //   return { publicId, url };
-    // });
+    const { __v, _id, category, createdAt, createdBy, description, images, isSold, name, price } = product;
 
     return {
       __v,
