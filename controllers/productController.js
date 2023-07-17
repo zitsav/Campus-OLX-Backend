@@ -67,7 +67,7 @@ const getProductById = asyncHandler(async (req, res) => {
 });
 
 const getAllProductsOfUser = asyncHandler(async (req, res) => {
-  const products = await Product.find({ createdBy: req.user._id }).sort(
+  const products = await Product.find({ createdBy: req.user }).sort(
     { createdAt: -1 }
   );
 
