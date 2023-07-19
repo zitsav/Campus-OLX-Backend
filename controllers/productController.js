@@ -67,12 +67,16 @@ const getProductById = asyncHandler(async (req, res) => {
 });
 
 const getAllProductsOfUser = asyncHandler(async (req, res) => {
-  const products = await Product.find({ createdBy: req.user }).sort(
+  console.log('yes')
+  const products = await Product.find({ createdBy: new mongoose.Types.ObjectId(req.user._id)}).sort(
     { createdAt: -1 }
   );
+  console.log(products)
 
   const formattedProducts = products.map((product) => {
     const { __v, _id, category, createdAt, createdBy, description, images, isSold, name, price } = product;
+
+    console.log(product)
 
     return {
       __v,
