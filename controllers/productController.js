@@ -68,16 +68,13 @@ const getProductById = asyncHandler(async (req, res) => {
 });
 
 const getAllProductsOfUser = asyncHandler(async (req, res) => {
-  const userId = req.params.id
-  const products = await Product.find({ createdBy: new mongoose.Types.ObjectId(userId)}).sort(
+  const userId = req.params.id;
+  const products = await Product.find({ createdBy: new mongoose.Types.ObjectId(userId) }).sort(
     { createdAt: -1 }
   );
-  // console.log(products)
 
   const formattedProducts = products.map((product) => {
     const { __v, _id, category, createdAt, createdBy, description, images, isSold, name, price } = product;
-
-    // console.log(product)
 
     return {
       __v,
@@ -93,7 +90,7 @@ const getAllProductsOfUser = asyncHandler(async (req, res) => {
     };
   });
 
-  res.status(StatusCodes.OK).json({ formattedProducts });
+  res.status(StatusCodes.OK).json(formattedProducts);
 });
 
 
