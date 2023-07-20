@@ -19,6 +19,6 @@ router.route("/").get(getAllProducts).post(protect, createProduct);
 router.route("/:id").put(protect, editProduct).delete(protect, deleteProduct).get(getProductById);
 router.post("/upload", protect, uploadProductImage);
 router.route("/filter").get(protect,searchByCategory);
-router.get("/user", protect, getAllProductsOfUser);
+router.get("/user/:id", protect, getAllProductsOfUser);
 
 module.exports = router;

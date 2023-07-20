@@ -2,6 +2,7 @@ const fs = require("fs");
 const cloudinary = require("cloudinary").v2;
 const User = require("../models/User");
 const asyncHandler = require("express-async-handler");
+const mongoose = require("mongoose");
 const Product = require("../models/Product");
 const path = require('path');
 const { StatusCodes } = require("http-status-codes");
@@ -67,16 +68,16 @@ const getProductById = asyncHandler(async (req, res) => {
 });
 
 const getAllProductsOfUser = asyncHandler(async (req, res) => {
-  console.log('yes')
-  const products = await Product.find({ createdBy: new mongoose.Types.ObjectId(req.user._id)}).sort(
+  const userId = req.params.id
+  const products = await Product.find({ createdBy: new mongoose.Types.ObjectId(userId)}).sort(
     { createdAt: -1 }
   );
-  console.log(products)
+  // console.log(products)
 
   const formattedProducts = products.map((product) => {
     const { __v, _id, category, createdAt, createdBy, description, images, isSold, name, price } = product;
 
-    console.log(product)
+    // console.log(product)
 
     return {
       __v,
