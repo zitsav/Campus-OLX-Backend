@@ -132,4 +132,28 @@ const getCurrentUserProfile = asyncHandler(async (req, res) => {
   });
 });
 
-module.exports = { updateUser, getCurrentUserProfile, uploadProfilePicture };
+
+const getUserById = asyncHandler(async (req, res) => {
+  const userId = req.params.id;
+
+  const user = await User.findById(userId);
+
+  if (!user) {
+    res.status(404);
+    throw new Error("User not found");
+  }
+
+  res.status(200).json({
+    _id: user._id,
+    name: user.name,
+    email: user.email,
+    contact: user.contact,
+    enrollmentNo: user.enrollmentNo,
+    semester: user.semester,
+    upiId: user.upiId,
+    profilePicture: user.profilePicture,
+    // @TODO Include other profile information you want to return
+  });
+});
+
+module.exports = { updateUser, getCurrentUserProfile, uploadProfilePicture, getUserById };

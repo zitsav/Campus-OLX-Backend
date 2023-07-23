@@ -241,6 +241,29 @@ const deleteUser = asyncHandler(async (req, res) => {
   res.json({ message: "User deleted" });
 });
 
+const getUserById = asyncHandler(async (req, res) => {
+  const userId = req.params.id;
+
+  const user = await User.findById(userId);
+
+  if (!user) {
+    res.status(404);
+    throw new Error("User not found");
+  }
+
+  res.status(200).json({
+    _id: user._id,
+    name: user.name,
+    email: user.email,
+    contact: user.contact,
+    enrollmentNo: user.enrollmentNo,
+    semester: user.semester,
+    upiId: user.upiId,
+    profilePicture: user.profilePicture,
+    // @TODO Include other profile information you want to return
+  });
+});
+
 // Middleware to refresh token if it expires before verification
 // const refreshExpiredToken = async (req, res, next) => {
 //   try {
@@ -263,4 +286,4 @@ const deleteUser = asyncHandler(async (req, res) => {
 
 // @TODO: Micellaneous conroller functions to be added here
 
-module.exports = { registerUser, verifyCode, resetPassword, forgotPassword, deleteUser };
+module.exports = { registerUser, verifyCode, resetPassword, forgotPassword, deleteUser, getUserById };

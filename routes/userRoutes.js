@@ -10,7 +10,7 @@ const {
   resetPassword,
   forgotPassword,
   deleteUser,
-  refreshExpiredToken
+  getUserById
 } = require("../controllers/authController");
 
 const router = express.Router();
@@ -32,5 +32,7 @@ router.put('/updateProfile/:id', protect, updateUser);
 router.get("/profile",protect,getCurrentUserProfile);
 router.post("/upload", protect, uploadProfilePicture)
 router.route("/").get(protect, allUsers);
+
+router.get('/:id', protect, getUserById)
 
 module.exports = router;
