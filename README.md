@@ -13,9 +13,9 @@ Welcome to Campus OLX - your campus community's online marketplace for buying an
 
 ## ContributersThis project is contributed by:
 
+- Utsav Singh Tomar
 - Sumit Das
 - Suhail Ahmad Khan
-- Yousav
 
 ## Installation
 
