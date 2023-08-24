@@ -30,7 +30,7 @@ To run the Grievance Portal locally, follow these steps:
 
 ## Login Details
 
-- To login as a user, you need to register yourself first. If you need an existing account the credentials are email:"iit2021112@iiita.ac.in",password:"savvy123"
+- To login as a user, you need to register yourself first. If you need an existing account the credentials are email:"iit2021112@iiita.ac.in",password:"password"
 
 ## Contact Information
 
