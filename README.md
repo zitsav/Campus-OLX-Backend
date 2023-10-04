@@ -19,7 +19,7 @@ Welcome to Campus OLX - your campus community's online marketplace for buying an
 
 ## Installation
 
-To run the Grievance Portal locally, follow these steps:
+To run the Campus-OLX backend API locally, follow these steps:
 
 1. Clone the repository to your local machine.
 2. Install the dependencies for both frontend and backend using `npm install` command.
