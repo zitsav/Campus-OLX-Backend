@@ -11,7 +11,7 @@ Welcome to Campus OLX - your campus community's online marketplace for buying an
 - Cloudinary Image Upload: Upload product images using Cloudinary.js for optimized storage.
 - User Profile Management: Manage your profile, listed products, and track transactions.
 
-## ContributersThis project is contributed by:
+## This project is contributed by:
 
 - Utsav Singh Tomar
 - Sumit Das
